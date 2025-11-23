@@ -1,0 +1,277 @@
+# --- Подготовка Git и репозитория ---
+
+# Настройка имени и почты (однократно для глобальной конфигурации)
+git config --global user.name "Evgen"
+git config --global user.email "evgen@example.com"
+
+# Инициализация локального репозитория в папке lab-git-pp
+git init
+
+# Проверка статуса после создания README.md и .gitignore
+git status
+
+# Добавление файлов в индекс и первый коммит
+git add .
+git commit -m "init: add readme and gitignore"
+
+# Переименование ветки master в main
+git branch -M main
+
+# Подключение удалённого репозитория студента на GitHub
+git remote add origin https://github.com/Evgen11123/lab-git-pp.git
+
+# Первый push ветки main в удалённый репозиторий
+git push -u origin main
+
+
+# --- Создание ветки develop и первой feature-ветки feature/base-code ---
+
+# Создание ветки develop от main и переход на неё
+git checkout -b develop
+
+# Публикация ветки develop на GitHub
+git push -u origin develop
+
+# Создание feature-ветки для базового кода
+git checkout -b feature/base-code
+
+# Добавление файла main.txt с описанием основной программы
+git add main.txt
+git commit -m "feat: add main program description"
+
+# Публикация feature-ветки feature/base-code
+git push -u origin feature/base-code
+
+# Возврат в ветку develop
+git checkout develop
+
+# Слияние feature/base-code -> develop с запретом fast-forward
+git merge --no-ff feature/base-code -m "merge: add base program"
+
+# Отправка обновлённой ветки develop на GitHub
+git push
+
+
+# --- Ветка feature/validation, rebase на develop и merge ---
+
+# Контрольный переход в develop (ветка уже активна)
+git checkout develop
+
+# Создание ветки feature/validation от develop
+git checkout -b feature/validation
+
+# Добавление описания валидации ввода в main.txt
+git add main.txt
+git commit -m "feat: add input validation description"
+
+# Возврат в develop
+git checkout develop
+
+# Добавление описания логирования в logging.txt
+git add logging.txt
+git commit -m "feat: describe logging subsystem"
+
+# Публикация обновлённого develop
+git push
+
+# Переход в ветку feature/validation
+git checkout feature/validation
+
+# Перебазирование feature/validation на актуальный develop
+git rebase develop
+
+# Публикация feature/validation после rebase
+git push -u origin feature/validation
+
+# Возврат в develop
+git checkout develop
+
+# Слияние feature/validation -> develop с использованием --no-ff
+git merge --no-ff feature/validation -m "merge: add input validation"
+
+# Публикация обновлённого develop
+git push
+
+
+# --- Ветка feature/docs и cherry-pick коммита в develop ---
+
+# Контрольный переход в develop
+git checkout develop
+
+# Создание ветки feature/docs для документации
+git checkout -b feature/docs
+
+# Добавление описания структуры репозитория в README.md
+git add README.md
+git commit -m "docs: describe repository structure"
+
+# Публикация feature/docs
+git push -u origin feature/docs
+
+# Просмотр краткой истории коммитов (для определения хэша docs-коммита)
+git log --oneline
+
+# Возврат в develop
+git checkout develop
+
+# Перенос коммита с документацией из feature/docs в develop с помощью cherry-pick
+git cherry-pick dbd6c97
+
+# Публикация develop после cherry-pick
+git push
+
+
+# --- Создание конфликта merge и его разрешение вручную ---
+
+# Переход в develop и добавление базового файла для конфликта
+git checkout develop
+git add conflict.txt
+git commit -m "feat: add base conflict file"
+git push
+
+# Создание ветки feature/conflict от develop
+git checkout -b feature/conflict
+
+# Изменение conflict.txt в ветке feature/conflict
+git add conflict.txt
+git commit -m "feat: change line in conflict file (feature/conflict)"
+
+# Публикация feature/conflict
+git push -u origin feature/conflict
+
+# Возврат в develop и изменение конфликтующей строки там же
+git checkout develop
+git add conflict.txt
+git commit -m "feat: change line in conflict file (develop)"
+git push
+
+# Попытка слияния feature/conflict -> develop, приводящая к конфликту
+git merge feature/conflict
+
+# (На этом этапе конфликт был решён вручную в файле conflict.txt.)
+
+# Фиксация решённого конфликта и завершение merge
+git add conflict.txt
+git commit -m "merge: resolve conflict between develop and feature/conflict"
+git push
+
+
+# --- Ветка feature/reset-playground: revert, reset, restore ---
+
+# Переход в develop и создание ветки для демонстрации откатов
+git checkout develop
+git checkout -b feature/reset-playground
+
+# Публикация feature/reset-playground
+git push -u origin feature/reset-playground
+
+# Создание "плохого" коммита для демонстрации git revert
+git add bad.txt
+git commit -m "feat: add bad file for revert demo"
+
+# Откат последнего коммита с помощью git revert (создаётся новый обратный коммит)
+git revert --no-edit HEAD
+
+# Создание коммита для демонстрации git reset --soft
+git add soft.txt
+git commit -m "test: soft reset demo"
+
+# Мягкий откат на один коммит назад (изменения остаются в индексе)
+git reset --soft HEAD~1
+
+# Создание коммита для демонстрации git reset --hard
+git add hard.txt
+git commit -m "test: hard reset demo"
+
+# Жёсткий откат на один коммит назад (коммит и изменения удаляются)
+git reset --hard HEAD~1
+
+# Демонстрация git restore: отмена незакоммиченных изменений в main.txt
+git restore main.txt
+
+# Возврат в ветку develop
+git checkout develop
+
+
+# --- Добавление скрипта тестов и настройка Git hooks (демонстрация работы pre-commit, commit-msg, pre-push) ---
+
+# Добавление скрипта простых тестов run_tests.sh
+git add run_tests.sh
+git commit -m "chore: add simple test script"
+git push
+
+# Копирование рабочих хуков в папку hooks_examples (команды cp и mkdir выполнены вне этого скрипта)
+
+# Добавление папки hooks_examples в индекс (скрипты хуков для отчёта)
+git add hooks_examples
+
+# Попытка коммита, заблокированная pre-commit хуком из-за найденного TDO
+git commit -m "chore: add hook scripts examples"
+
+# После правки hooks_examples/pre-commit.sh (удаление/изменение TDO в комментарии) повторное добавление файла
+git add hooks_examples/pre-commit.sh
+
+# Успешный коммит скриптов хуков
+git commit -m "chore: add hook scripts examples"
+
+# Push срабатывает через pre-push hook, который запускает run_tests.sh
+git push
+
+
+# --- Слияние develop -> main и создание тега v1.0 ---
+
+# Переход в ветку main
+git checkout main
+
+# Обновление локальной main с удалённой
+git pull
+
+# Слияние develop -> main с подготовкой релиза v1.0
+git merge --no-ff develop -m "merge: prepare v1.0 release"
+
+# Публикация обновлённой ветки main
+git push
+
+# Создание аннотированного тега v1.0
+git tag -a v1.0 -m "v1.0: main lab version"
+
+# Публикация тега v1.0 на удалённый репозиторий
+git push origin v1.0
+
+
+# --- Дополнительный функционал (feature/bonus) и тег v1.1-beta ---
+
+# Переход в develop и создание ветки feature/bonus
+git checkout develop
+git checkout -b feature/bonus
+
+# Добавление в main.txt описания дополнительного функционала
+git add main.txt
+git commit -m "feat: add bonus functionality description"
+
+# Публикация feature/bonus
+git push -u origin feature/bonus
+
+# Возврат в develop
+git checkout develop
+
+# Слияние feature/bonus -> develop
+git merge --no-ff feature/bonus -m "merge: add bonus functionality"
+
+# Публикация обновлённого develop
+git push
+
+# Переход в main
+git checkout main
+
+# Слияние develop -> main перед выпуском v1.1-beta
+git merge --no-ff develop -m "merge: prepare v1.1-beta"
+
+# Публикация обновлённой main
+git push
+
+# Создание аннотированного тега v1.1-beta
+git tag -a v1.1-beta -m "v1.1-beta: bonus features"
+
+# Публикация тега v1.1-beta
+git push origin v1.1-beta
